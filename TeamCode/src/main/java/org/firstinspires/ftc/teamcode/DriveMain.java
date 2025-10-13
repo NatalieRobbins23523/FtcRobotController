@@ -1,170 +1,108 @@
 package org.firstinspires.ftc.teamcode;
+
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.CRServo;
-
 
 @TeleOp
 public class DriveMain extends LinearOpMode {
 
-
-    //declares motors
+    // Declare motors
     private DcMotor frontLeft;
     private DcMotor backLeft;
     private DcMotor frontRight;
     private DcMotor backRight;
     private DcMotor elevator;
-    private Servo elevatorPincher;
-    private DcMotor arm;
-    private CRServo intakeSpinner;
-    //private CRServo armTelescope;
+    private DcMotor Shooter;
+    private CRServo Intake;
 
-
-
-
+    @Override
     public void runOpMode() {
-        //defines motors
+        // Initialize motors
         frontLeft = hardwareMap.get(DcMotor.class, "frontLeft");
         backLeft = hardwareMap.get(DcMotor.class, "backLeft");
         frontRight = hardwareMap.get(DcMotor.class, "frontRight");
         backRight = hardwareMap.get(DcMotor.class, "backRight");
         frontRight.setDirection(DcMotor.Direction.REVERSE);
         backRight.setDirection(DcMotor.Direction.REVERSE);
-        elevatorPincher = hardwareMap.get(Servo.class, "elevatorPincher");
-        intakeSpinner = hardwareMap.get(CRServo.class, "intakeSpinner");
-        intakeSpinner.setDirection(DcMotorSimple.Direction.REVERSE);
 
-
-        arm = hardwareMap.get(DcMotor.class, "arm");
-        arm.setDirection(DcMotor.Direction.REVERSE);
-        //arm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        arm.setTargetPosition(0);
-        arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        //armTelescope = hardwareMap.get(CRServo.class, "armTelescope");
-
+        Shooter = hardwareMap.get(DcMotor.class, "Shooter");
+        Intake = hardwareMap.get(CRServo.class, "Intake");
 
         elevator = hardwareMap.get(DcMotor.class, "elevator");
         elevator.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         elevator.setTargetPosition(0);
-        // elevator.setDirection(DcMotor.Direction.REVERSE);
-        elevator.setMode((DcMotor.RunMode.RUN_TO_POSITION));
         elevator.setDirection(DcMotor.Direction.REVERSE);
+        elevator.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
         int numClicks = 1;
-        elevatorPincher.setPosition(.3);
-        waitForStart();
-
-
-
-
-        double tgtPowerY = 0.0;
-        double tgtPowerTurn = 0.0;
-        double tgtPowerSide = 0.0;
         boolean isReversed = false;
         boolean isIntakeTurning = false;
         boolean isIntakeTurningReverse = false;
+        boolean isShooterShooting = false;
+        boolean isShooterShootingReverse = false;
+        boolean shooterTriggerPressed = false;
+        boolean reverseShooterTriggerPressed = false;
 
 
-        while (opModeIsActive()){
-            if(gamepad1.right_bumper){
+        waitForStart();
+
+        while (opModeIsActive()) {
+            // Toggle driving reverse
+            if (gamepad1.right_bumper) {
                 isReversed = !isReversed;
-                sleep(300); //makes sure reverse isn't toggled multiple times
+                sleep(300);
             }
-            //driving
-            tgtPowerY = gamepad1.left_stick_y;
 
-
-            // If the power on the left joystick is less than 0.5, halve the power
+            // Drive forward/backward
+            double tgtPowerY = gamepad1.left_stick_y;
             if (Math.abs(tgtPowerY) < 0.5) {
                 tgtPowerY /= 2;
             }
-
-
-
-
             driveStraight(tgtPowerY, isReversed);
 
-
-
-
-            //turning
-            tgtPowerTurn = gamepad1.right_stick_x;
+            // Turning
+            double tgtPowerTurn = gamepad1.right_stick_x;
             turn(tgtPowerTurn);
 
-
-            //sideways
-            tgtPowerSide = gamepad1.left_stick_x;
-
-
-            if(Math.abs(tgtPowerSide) < 0.5) {
+            // Strafing
+            double tgtPowerSide = gamepad1.left_stick_x;
+            if (Math.abs(tgtPowerSide) < 0.5) {
                 tgtPowerSide /= 2;
-                // tgtPowerSide = tgtPowerSide/2;
             }
-
-
             driveSideways(tgtPowerSide, isReversed);
 
-
-            if(gamepad1.x){
+            // Elevator Controls
+            if (gamepad1.x) {
                 releaseElevator();
                 numClicks++;
                 sleep(200);
             }
 
-
             if (gamepad1.y) {
                 raiseElevator();
             }
-
-
-            if (gamepad1.a) {
-                setElevatorGrabbingPosition();
-            }
-
-
-            if (gamepad1.b) {
-                numClicks++;
-                sleep(300);
-                changePincher(numClicks);
-            }
-
 
             if (gamepad1.left_bumper) {
                 setElevatorZero();
                 sleep(200);
             }
-            if(gamepad2.b){
+
+            // Intake Controls
+            if (gamepad2.b) {
                 isIntakeTurning = !isIntakeTurning;
                 sleep(200);
                 changeIntake(isIntakeTurning);
             }
-            if(gamepad2.dpad_left){
+
+            if (gamepad2.dpad_left || gamepad2.left_bumper) {
                 isIntakeTurningReverse = !isIntakeTurningReverse;
-                sleep(200);
-                changeIntake(isIntakeTurningReverse);
-            }
-
-
-            if(gamepad2.a){
-                armDown();
-            }
-            if(gamepad2.x){
-                armOut();
-            }
-            if(gamepad2.y){
-                armUp();
-            }
-            if(gamepad2.left_bumper){
-                isIntakeTurningReverse=!isIntakeTurningReverse;
                 sleep(200);
                 reverseIntake(isIntakeTurningReverse);
             }
-            //armTelescope.setPower(gamepad2.left_stick_y);
 
-
-            //lets us manually control elevator position
+            // Elevator Fine Adjustments
             int targetPosition = elevator.getCurrentPosition();
             if (gamepad2.dpad_up) {
                 targetPosition += 50;
@@ -176,135 +114,120 @@ public class DriveMain extends LinearOpMode {
                 elevator.setTargetPosition(targetPosition);
                 elevator.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                 elevator.setPower(1);
-            } else if (gamepad2.dpad_right){
+            } else if (gamepad2.dpad_right) {
                 elevator.setPower(0);
                 elevator.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
             }
 
+            // Shooter forward
+            // Shooter forward
+            if (gamepad2.right_trigger > 0.5 && !shooterTriggerPressed) {
+                if (!isShooterShootingReverse) { // Prevent conflict
+                    isShooterShooting = !isShooterShooting;
+                    shootShooter(isShooterShooting);
+                }
+                shooterTriggerPressed = true;
+            } else if (gamepad2.right_trigger <= 0.5) {
+                shooterTriggerPressed = false;
+            }
+
+            // Shooter reverse
+            if (gamepad2.left_trigger > 0.5 && !reverseShooterTriggerPressed) {
+                if (!isShooterShooting) { // Prevent conflict
+                    isShooterShootingReverse = !isShooterShootingReverse;
+                    reverseShooter(isShooterShootingReverse);
+                }
+                reverseShooterTriggerPressed = true;
+            } else if (gamepad2.left_trigger <= 0.5) {
+                reverseShooterTriggerPressed = false;
+            }
 
         }
+        }
 
-
+    // Drive Functions
+    public void driveStraight(double power, boolean reversed) {
+        double pwr = reversed ? -power : power;
+        frontLeft.setPower(pwr);
+        backLeft.setPower(pwr);
+        frontRight.setPower(pwr);
+        backRight.setPower(pwr);
     }
 
-
-    public void driveStraight(double pwrX, boolean isReversed){
-        if(isReversed){
-            frontLeft.setPower(-pwrX);
-            backLeft.setPower(-pwrX);
-            frontRight.setPower(-pwrX);
-            backRight.setPower(-pwrX);
-        }
-        else{
-            frontLeft.setPower(pwrX);
-            backLeft.setPower(pwrX);
-            frontRight.setPower(pwrX);
-            backRight.setPower(pwrX);
-        }
-
-
-    }
-
-
-    public void turn(double direction){
+    public void turn(double direction) {
         frontLeft.setPower(-direction);
         backLeft.setPower(-direction);
         frontRight.setPower(direction);
         backRight.setPower(direction);
     }
 
+    public void driveSideways(double speed, boolean reversed) {
+        double fl = reversed ? speed : -speed;
+        double bl = reversed ? -speed : speed;
+        double fr = reversed ? -speed : speed;
+        double br = reversed ? speed : -speed;
 
-    public void driveSideways(double speed, boolean isReversed){
-        if(isReversed){
-            frontLeft.setPower(speed);
-            backLeft.setPower(-speed);
-            frontRight.setPower(-speed);
-            backRight.setPower(speed);
-        }
-        else{
-            frontLeft.setPower(-speed);
-            backLeft.setPower(speed);
-            frontRight.setPower(speed);
-            backRight.setPower(-speed);
-        }
+        frontLeft.setPower(fl);
+        backLeft.setPower(bl);
+        frontRight.setPower(fr);
+        backRight.setPower(br);
     }
 
+    // Elevator Functions
+    public void raiseElevator() {
+        elevator.setPower(1);
+        elevator.setTargetPosition(3000);
+    }
 
-    public void setElevatorGrabbingPosition(){ //sets elevator to grab from wall
-        if (elevator.getCurrentPosition() != 450) { // Assuming 200 is the target
+    public void releaseElevator() {
+        elevator.setPower(1);
+        elevator.setTargetPosition(400);
+    }
+
+    public void setElevatorZero() {
+        elevator.setPower(1);
+        elevator.setTargetPosition(0);
+    }
+
+    public void setElevatorGrabbingPosition() {
+        if (elevator.getCurrentPosition() != 450) {
             elevator.setPower(1);
             elevator.setTargetPosition(450);
             elevator.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         }
     }
-    public void raiseElevator(){ //sets elevator to place on bar
-        elevator.setPower(1);
-        elevator.setTargetPosition(3000);
-    }
-    public void releaseElevator(){ //lowers elevator to put block on bar
-        elevator.setPower(1);
-        elevator.setTargetPosition(400);
-        sleep(400);
-        elevatorPincher.setPosition(0.8);
-        sleep(200);
-        setElevatorGrabbingPosition();
-    }
-    public void setElevatorZero(){
-        elevator.setPower(1);
-        elevator.setTargetPosition(0);
-    }
-    public void changePincher(int numClicks){
-        if(numClicks%2 ==0){
-            elevatorPincher.setPosition(.8);
-        }
-        else{
-            elevatorPincher.setPosition(.3);
+
+    // Intake Functions
+    public void changeIntake(boolean isIntakeTurning) {
+        if (isIntakeTurning) {
+            Intake.setPower(1);
+        } else {
+            Intake.setPower(0);
         }
     }
 
-
-    public void changeIntake(boolean isIntakeTurning){
-        if(isIntakeTurning){
-            intakeSpinner.setPower(1);
-        }
-        else{
-            intakeSpinner.setPower(0);
+    public void reverseIntake(boolean isIntakeTurning) {
+        if (isIntakeTurning) {
+            Intake.setPower(-1);
+        } else {
+            Intake.setPower(0);
         }
     }
 
-
-    public void reverseIntake(boolean isIntakeTurning){
-        if(isIntakeTurning){
-            intakeSpinner.setPower(-1);
-        }
-        else{
-            intakeSpinner.setPower(0);
+    public void shootShooter(boolean isShooterShooting) {
+        if (isShooterShooting) {
+            Shooter.setPower(1);
+        } else {
+            Shooter.setPower(0);
         }
     }
 
-
-    public void armUp(){
-        arm.setPower(0.5);
-        arm.setTargetPosition(2300);
+    public void reverseShooter(boolean isShooterShootingReverse) {
+        if (isShooterShootingReverse) {
+            Shooter.setPower(-1);
+        } else {
+            Shooter.setPower(0);
+        }
     }
-
-
-    public void armDown(){
-        arm.setPower(0.5);
-        arm.setTargetPosition(0);
-    }
-
-
-    public void armOut(){
-        arm.setPower(0.5);
-        arm.setTargetPosition(500);
-    }
-
-
-    public void armInBucket(){
-        arm.setPower(0.5);
-        arm.setTargetPosition(3400);
-    }
-
-
 }
