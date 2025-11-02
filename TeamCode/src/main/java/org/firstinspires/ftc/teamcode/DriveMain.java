@@ -13,9 +13,9 @@ public class DriveMain extends LinearOpMode {
     private DcMotor backLeft;
     private DcMotor frontRight;
     private DcMotor backRight;
-    private DcMotor elevator;
-    private DcMotor Shooter;
     private CRServo Intake;
+    private DcMotor MotorLeftShoot;
+    private DcMotor MotorRightShoot;
 
     @Override
     public void runOpMode() {
@@ -26,17 +26,11 @@ public class DriveMain extends LinearOpMode {
         backRight = hardwareMap.get(DcMotor.class, "backRight");
         frontRight.setDirection(DcMotor.Direction.REVERSE);
         backRight.setDirection(DcMotor.Direction.REVERSE);
+        MotorLeftShoot = hardwareMap.get(DcMotor.class, "MotorLeftShoot");
+        MotorRightShoot = hardwareMap.get(DcMotor.class, "MotorRightShoot");
 
-        Shooter = hardwareMap.get(DcMotor.class, "Shooter");
         Intake = hardwareMap.get(CRServo.class, "Intake");
 
-        elevator = hardwareMap.get(DcMotor.class, "elevator");
-        elevator.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        elevator.setTargetPosition(0);
-        elevator.setDirection(DcMotor.Direction.REVERSE);
-        elevator.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-
-        int numClicks = 1;
         boolean isReversed = false;
         boolean isIntakeTurning = false;
         boolean isIntakeTurningReverse = false;
@@ -73,22 +67,6 @@ public class DriveMain extends LinearOpMode {
             }
             driveSideways(tgtPowerSide, isReversed);
 
-            // Elevator Controls
-            if (gamepad1.x) {
-                releaseElevator();
-                numClicks++;
-                sleep(200);
-            }
-
-            if (gamepad1.y) {
-                raiseElevator();
-            }
-
-            if (gamepad1.left_bumper) {
-                setElevatorZero();
-                sleep(200);
-            }
-
             // Intake Controls
             if (gamepad2.b) {
                 isIntakeTurning = !isIntakeTurning;
@@ -102,30 +80,20 @@ public class DriveMain extends LinearOpMode {
                 reverseIntake(isIntakeTurningReverse);
             }
 
-            // Elevator Fine Adjustments
-            int targetPosition = elevator.getCurrentPosition();
-            if (gamepad2.dpad_up) {
-                targetPosition += 50;
-                elevator.setTargetPosition(targetPosition);
-                elevator.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                elevator.setPower(1);
-            } else if (gamepad2.dpad_down) {
-                targetPosition -= 50;
-                elevator.setTargetPosition(targetPosition);
-                elevator.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                elevator.setPower(1);
-            } else if (gamepad2.dpad_right) {
-                elevator.setPower(0);
-                elevator.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
+            if (gamepad1.x) {
+                setMotorLeftShootPower(-1.0);
+                setMotorRightShootPower(1.0);// Run forward
+            }
+            if(gamepad1.y){
+                setMotorLeftShootPower(0.0);
+                setMotorRightShootPower(0.0);// Stop when y is pressed
             }
 
-            // Shooter forward
-            // Shooter forward
             if (gamepad2.right_trigger > 0.5 && !shooterTriggerPressed) {
                 if (!isShooterShootingReverse) { // Prevent conflict
                     isShooterShooting = !isShooterShooting;
-                    shootShooter(isShooterShooting);
+                   // shootShooter(isShooterShooting);
                 }
                 shooterTriggerPressed = true;
             } else if (gamepad2.right_trigger <= 0.5) {
@@ -136,7 +104,7 @@ public class DriveMain extends LinearOpMode {
             if (gamepad2.left_trigger > 0.5 && !reverseShooterTriggerPressed) {
                 if (!isShooterShooting) { // Prevent conflict
                     isShooterShootingReverse = !isShooterShootingReverse;
-                    reverseShooter(isShooterShootingReverse);
+                    //reverseShooter(isShooterShootingReverse);
                 }
                 reverseShooterTriggerPressed = true;
             } else if (gamepad2.left_trigger <= 0.5) {
@@ -174,29 +142,6 @@ public class DriveMain extends LinearOpMode {
         backRight.setPower(br);
     }
 
-    // Elevator Functions
-    public void raiseElevator() {
-        elevator.setPower(1);
-        elevator.setTargetPosition(3000);
-    }
-
-    public void releaseElevator() {
-        elevator.setPower(1);
-        elevator.setTargetPosition(400);
-    }
-
-    public void setElevatorZero() {
-        elevator.setPower(1);
-        elevator.setTargetPosition(0);
-    }
-
-    public void setElevatorGrabbingPosition() {
-        if (elevator.getCurrentPosition() != 450) {
-            elevator.setPower(1);
-            elevator.setTargetPosition(450);
-            elevator.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        }
-    }
 
     // Intake Functions
     public void changeIntake(boolean isIntakeTurning) {
@@ -215,7 +160,13 @@ public class DriveMain extends LinearOpMode {
         }
     }
 
-    public void shootShooter(boolean isShooterShooting) {
+    public void setMotorLeftShootPower(double power) {
+        MotorLeftShoot.setPower(power);  // Use setPower for CRServo
+    }
+    public void setMotorRightShootPower(double power) {
+        MotorRightShoot.setPower(power);
+    }
+   /* public void shootShooter(boolean isShooterShooting) {
         if (isShooterShooting) {
             Shooter.setPower(1);
         } else {
@@ -230,4 +181,6 @@ public class DriveMain extends LinearOpMode {
             Shooter.setPower(0);
         }
     }
+
+    */
 }
