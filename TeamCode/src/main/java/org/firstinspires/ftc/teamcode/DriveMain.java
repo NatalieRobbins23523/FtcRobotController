@@ -14,6 +14,7 @@ public class DriveMain extends LinearOpMode {
     private DcMotor frontRight;
     private DcMotor backRight;
     private CRServo Intake;
+    private CRServo Intake2;
     private DcMotor MotorLeftShoot;
     private DcMotor MotorRightShoot;
 
@@ -30,6 +31,7 @@ public class DriveMain extends LinearOpMode {
         MotorRightShoot = hardwareMap.get(DcMotor.class, "MotorRightShoot");
 
         Intake = hardwareMap.get(CRServo.class, "Intake");
+        Intake2 = hardwareMap.get(CRServo.class, "Intake2");
 
         boolean isReversed = false;
         boolean isIntakeTurning = false;
@@ -74,7 +76,7 @@ public class DriveMain extends LinearOpMode {
                 changeIntake(isIntakeTurning);
             }
 
-            if (gamepad2.dpad_left || gamepad2.left_bumper) {
+            if (gamepad2.a) {
                 isIntakeTurningReverse = !isIntakeTurningReverse;
                 sleep(200);
                 reverseIntake(isIntakeTurningReverse);
@@ -147,15 +149,19 @@ public class DriveMain extends LinearOpMode {
     public void changeIntake(boolean isIntakeTurning) {
         if (isIntakeTurning) {
             Intake.setPower(1);
+            Intake2.setPower(-1);
         } else {
             Intake.setPower(0);
+            Intake2.setPower(0);
         }
     }
 
     public void reverseIntake(boolean isIntakeTurning) {
         if (isIntakeTurning) {
             Intake.setPower(-1);
+            Intake.setPower(1);
         } else {
+            Intake.setPower(0);
             Intake.setPower(0);
         }
     }
