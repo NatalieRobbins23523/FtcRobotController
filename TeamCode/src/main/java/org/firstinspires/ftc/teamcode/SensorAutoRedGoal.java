@@ -67,14 +67,14 @@ public class SensorAutoRedGoal extends LinearOpMode {
     final int RED_GOAL_ID = 24;
     final int BLUE_GOAL_ID = 20;
     // Define waypoints to guide navigation in AUTO
-    final Pose2D ballsInfrontFar = new Pose2D(DistanceUnit.INCH, -12, 32, AngleUnit.DEGREES, 0);
+    final Pose2D ballsInfrontFar = new Pose2D(DistanceUnit.INCH, -12, 34, AngleUnit.DEGREES, 0);
     final Pose2D ballsInfrontMiddle = new Pose2D(DistanceUnit.INCH, 12, 34, AngleUnit.DEGREES, 0);
     final Pose2D ballsInfrontClose = new Pose2D(DistanceUnit.INCH, 36, 34, AngleUnit.DEGREES, 0);
     final Pose2D ballsHalfFar = new Pose2D(DistanceUnit.INCH, -12, 49.5, AngleUnit.DEGREES, 0);
     final Pose2D ballsHalfMiddle = new Pose2D(DistanceUnit.INCH, 12, 49.5, AngleUnit.DEGREES, 0);
     final Pose2D ballsHalfClose = new Pose2D(DistanceUnit.INCH, 36, 49.5, AngleUnit.DEGREES, 0);
-    final Pose2D ballsAfterFar = new Pose2D(DistanceUnit.INCH, -12, 57.5, AngleUnit.DEGREES, 0);
-    final Pose2D ballsAfterMiddle = new Pose2D(DistanceUnit.INCH, 12, 57.5, AngleUnit.DEGREES, 0);
+    final Pose2D ballsAfterFar = new Pose2D(DistanceUnit.INCH, -12, 58.5, AngleUnit.DEGREES, 0);
+    final Pose2D ballsAfterMiddle = new Pose2D(DistanceUnit.INCH, 12, 58.5, AngleUnit.DEGREES, 0);
     final Pose2D ballsAfterClose = new Pose2D(DistanceUnit.INCH, 33, 58.5, AngleUnit.DEGREES, 0);
     //    final Pose2D redAprilTagPosition = new Pose2D(DistanceUnit.INCH, -58.37, 55.64, AngleUnit.DEGREES, 46.4+90); // +90 because this is used to set odometry pose
 //    final Pose2D blueAprilTagPosition = new Pose2D(DistanceUnit.INCH, -58.37, -55.64, AngleUnit.DEGREES, 133.6+90);
@@ -153,7 +153,7 @@ public class SensorAutoRedGoal extends LinearOpMode {
 
         driveToPoint(shooterPoint, DEFAULT_SPEED_GAIN, DEFAULT_STRAFE_GAIN, DEFAULT_TURN_GAIN, DEFAULT_DRIVE_TIMEOUT,
                         DEFAULT_HEADING_TOLERANCE, DEFAULT_RANGE_TOLERANCE, DEFAULT_VELOCITY_TOLERANCE);
-        Shoot(1600, 1800);
+        Shoot(1800, 2200);
         //syncOdoToFTC(4000);
 
         // Print the current Position and Velocity of the robot.
@@ -197,7 +197,7 @@ public class SensorAutoRedGoal extends LinearOpMode {
 
         driveToPoint(shooterPoint, DEFAULT_SPEED_GAIN, DEFAULT_STRAFE_GAIN, DEFAULT_TURN_GAIN, DEFAULT_DRIVE_TIMEOUT,
                 DEFAULT_HEADING_TOLERANCE, DEFAULT_RANGE_TOLERANCE, DEFAULT_VELOCITY_TOLERANCE);
-        Shoot(1600, 1800);
+        Shoot(1800, 2100);
         //turnTransfer2(false);
         //syncOdoToFTC(1.0);
 
@@ -210,7 +210,7 @@ public class SensorAutoRedGoal extends LinearOpMode {
         turnIntake(false);
         driveToPoint(shooterPoint, DEFAULT_SPEED_GAIN, DEFAULT_STRAFE_GAIN, DEFAULT_TURN_GAIN, DEFAULT_DRIVE_TIMEOUT,
                 DEFAULT_HEADING_TOLERANCE, DEFAULT_RANGE_TOLERANCE, DEFAULT_VELOCITY_TOLERANCE);
-        Shoot(1600, 1800);
+        Shoot(1600, 1900);
         //turnTransfer2(true);
         //sleep(1500);
         //turnTransfer2(false);
@@ -225,7 +225,7 @@ public class SensorAutoRedGoal extends LinearOpMode {
         turnIntake(false);
         driveToPoint(shooterPoint, DEFAULT_SPEED_GAIN, DEFAULT_STRAFE_GAIN, DEFAULT_TURN_GAIN, DEFAULT_DRIVE_TIMEOUT,
                 DEFAULT_HEADING_TOLERANCE, DEFAULT_RANGE_TOLERANCE, DEFAULT_VELOCITY_TOLERANCE);
-        Shoot(1600, 1800);
+        Shoot(1600, 1900);
         //turnTransfer2(false);
         turnIntake(false);
         turnTopShooter(false, 0);
@@ -264,7 +264,7 @@ public class SensorAutoRedGoal extends LinearOpMode {
 
     // transfer
     public void turnTransfer(boolean on) {
-        if (on) { transfer.setPower(-1); }
+        if (on) { transfer.setPower(-0.7); }
         else { transfer.setPower(0); }
     }
 

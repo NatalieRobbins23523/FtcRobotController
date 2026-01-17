@@ -69,7 +69,7 @@ public class SensorAutoRedAudience extends LinearOpMode {
     final Pose2D ballsLoadingZoneAfter = new Pose2D(DistanceUnit.INCH, 54, 68, AngleUnit.DEGREES, 0);
 
     //FIX SHOOTER POINT HERE
-    final Pose2D shooterPoint = new Pose2D(DistanceUnit.INCH, 60, 24, AngleUnit.DEGREES, NormalizeAngle(-225));
+    final Pose2D shooterPoint = new Pose2D(DistanceUnit.INCH, 48, 24, AngleUnit.DEGREES, NormalizeAngle(-225));
     //is in field coordinates
     final Pose2D finalParkingPoint = new Pose2D(DistanceUnit.INCH, 54, 48, AngleUnit.DEGREES,0); //usually 225
 
